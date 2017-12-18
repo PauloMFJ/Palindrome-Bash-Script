@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Script to check for and output sorted palindrome words
-# from passed in standard input. Where a palindrome word is a word that
+# from passed in standard input. A palindrome word is a word that
 # reads the same backwards as forwards, such as civic.
 
 temp="$(mktemp /var/tmp/palindrome.XXXXXX)"   # Create temp file
@@ -19,4 +19,3 @@ rev "$temp" | paste - "$temp" |   # Paste file contents side-by-side on match
    sed -E "/^(.)\1+$/d" |         # Remove lines with only 1 unique character
    grep -x ".\{3,\}" |            # Remove words less than 3 characters in length
    sort | uniq -c | sort -nr      # Output sorted list
-   
