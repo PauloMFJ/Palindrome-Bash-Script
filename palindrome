@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# Script to check for and output sorted palindrome words
+# from passed in standard input. Where a palindrome word is a word that
+# reads the same backwards as forwards, such as civic.
+
+temp="$(mktemp /var/tmp/palindrome.XXXXXX)"   # Create temp file
+function exitPalindrome {                     # Function to remove temp file
+   rm -f "$temp" 
+}
+trap exitPalindrome EXIT                      # Remove temp file on exit
+
+grep -o "\b[[:alpha:][:punct:]]\{3,\}\b" "$@" |   # Extract all words from standard input
+   grep -v "-" |                                  # Remove hypthenated words
+   tr -d "[:punct:]" |                            # Remove punctuation
+   tr "[:upper:]" "[:lower:]" >"$temp"            # Convert to lowercase and pass into temp file
+
+rev "$temp" | paste - "$temp" |   # Paste file contents side-by-side on match
+   awk '$1 == $2 {print $1}' |    # Palindrome check each line
+   sed -E "/^(.)\1+$/d" |         # Remove lines with only 1 unique character
+   grep -x ".\{3,\}" |            # Remove words less than 3 characters in length
+   sort | uniq -c | sort -nr      # Output sorted list
+   
